@@ -13,12 +13,12 @@ export class ItemsResolver {
     async createItem(
         @Args('createItemInput') createItemInput: CreateItemInput,
     ): Promise<Item> {
-        return this.itemsService.create(createItemInput);
+        return await this.itemsService.create(createItemInput);
     }
 
   @Query(() => [Item], { name: 'items' })
   async findAll(): Promise<Item[]> {
-      return this.itemsService.findAll();
+      return await this.itemsService.findAll();
   }
 
   @Query(() => Item, { name: 'itemBy' })
