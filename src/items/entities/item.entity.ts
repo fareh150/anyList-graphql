@@ -16,7 +16,7 @@ export class Item {
     @Field(() => Float)
         quantity: number;
 
-    @Column()
-    @Field(() => String)
-        quantityUnits: string;
+    @Column({ nullable: true }) // avisa al db
+    @Field(() => String, { nullable: true }) // avisa al graphql
+        quantityUnits?: string; // avisa en typescript
 }
