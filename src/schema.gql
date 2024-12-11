@@ -30,5 +30,5 @@ input UpdateItemInput {
   name: String
   quantity: Float
   quantityUnit: String
-  id: Int!
+  id: ID!
 }
