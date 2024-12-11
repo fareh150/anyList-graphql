@@ -21,12 +21,14 @@ type Mutation {
 }
 
 input CreateItemInput {
-  """Example field (placeholder)"""
-  exampleField: Int!
+  name: String!
+  quantity: Float!
+  quantityUnit: String
 }
 
 input UpdateItemInput {
-  """Example field (placeholder)"""
-  exampleField: Int
+  name: String
+  quantity: Float
+  quantityUnit: String
   id: Int!
 }
