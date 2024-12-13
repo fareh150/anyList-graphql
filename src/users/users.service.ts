@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException, Logger, NotFoundException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { User } from './entities/user.entity';
 import { UpdateUserInput } from './dto/update-user.input';
@@ -33,8 +33,16 @@ export class UsersService {
         return [];
     }
 
-    findOne(id: string): Promise<User> {
-        throw new Error('Method not implemented.');
+    async findOneByEmail(email: string): Promise<User> {
+        try {
+            return await this.usersRepository.findOneByOrFail({ email });
+        } catch (error) {
+            throw new NotFoundException(`${email} not found`);
+            // this.handleDbError({
+            //     code  : 'error-001',
+            //     detail: `${email} not found`,
+            // });
+        }
     }
 
     update(id: number, updateUserInput: UpdateUserInput) {
@@ -47,10 +55,14 @@ export class UsersService {
 
 
     private handleDbError(error: any): never {
-        this.logger.error( error );
         if (error.code === '23505') {
             throw new BadRequestException(error.detail.replace('Key', ''));
         }
+
+        // if (error.code === 'error-001') {
+        //     throw new BadRequestException(error.detail.replace('Key', ''));
+        // }
+        this.logger.error( error );
         throw new InternalServerErrorException('Database error, check the logs');
     }
 }
