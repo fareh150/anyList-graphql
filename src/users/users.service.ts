@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
 import { User } from './entities/user.entity';
 import { UpdateUserInput } from './dto/update-user.input';
 import { SignupInput } from 'src/auth/dto/signup.input';
@@ -7,6 +7,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class UsersService {
+
+    private logger: Logger = new Logger('UsersService');
 
     constructor(
         @InjectRepository(User)
@@ -19,7 +21,7 @@ export class UsersService {
 
             return await this.usersRepository.save(newUser);
         } catch (error) {
-            throw new BadRequestException('algo salio mal', error.message);
+            this.handleDbError(error);
         }
     }
 
@@ -37,5 +39,14 @@ export class UsersService {
 
     block(id: string): Promise<User> {
         throw new Error('Method not implemented.');
+    }
+
+
+    private handleDbError(error: any): never {
+        this.logger.error( error );
+        if (error.code === '23505') {
+            throw new BadRequestException(error.detail.replace('Key', ''));
+        }
+        throw new InternalServerErrorException('Database error, check the logs');
     }
 }
