@@ -28,7 +28,7 @@ export class AuthResolver {
     @Query(() => AuthResponse, { name: 'revalidate' })
     @UseGuards(JwtAuthGuard)
     revalidateToken(
-    @CurrentUser() user: User,
+    @CurrentUser(/* [ValidRoles.admin]*/) user: User, //example to use roles in the decorator
     ): AuthResponse {
         return this.authService.revalidateToken(user);
     }
