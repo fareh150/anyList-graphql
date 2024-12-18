@@ -1,6 +1,7 @@
 import { Resolver, Query, Mutation, Args, ID } from '@nestjs/graphql';
 import { UsersService } from './users.service';
 import { User } from './entities/user.entity';
+import { ValidRolesArgs } from './dto/roles.arg';
 
 @Resolver(() => User)
 export class UsersResolver {
@@ -8,7 +9,7 @@ export class UsersResolver {
 
   @Query(() => [User], { name: 'users' })
     async findAll(
-      @Args('validRoles') validRoles:string,
+      @Args() validRoles:ValidRolesArgs,
     ): Promise<User[]> {
         console.log({ validRoles });
 
