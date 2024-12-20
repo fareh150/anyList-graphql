@@ -7,5 +7,5 @@ export class ValidRolesArgs {
 
     @Field(() => [ValidRoles], { nullable: true })
     @IsArray()
-        roles: string[] = [];
+        roles: ValidRoles[] = [];
 }
