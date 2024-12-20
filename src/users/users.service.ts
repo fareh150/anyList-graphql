@@ -32,7 +32,12 @@ export class UsersService {
 
     async findAll( roles: ValidRoles[]): Promise<User[]> {
         if (roles.length === 0) {
-            return this.usersRepository.find();
+            return this.usersRepository.find({
+                // ! Not needed id lazy loading is enabled in entity
+                //relations: {
+                //    lastUpdatedBy: true,
+                //},
+            });
         }
         return this.usersRepository.createQueryBuilder()
             .andWhere('ARRAY [roles] &&  ARRAY[:...roles]')
@@ -54,7 +59,10 @@ export class UsersService {
 
     async findOneById(id: string): Promise<User> {
         try {
-            return await this.usersRepository.findOneByOrFail({ id });
+            return await this.usersRepository.findOne({
+                where    : { id },
+                relations: ['lastUpdatedBy'],
+            });
         } catch (error) {
             throw new NotFoundException(`${id} not found`);
         }
@@ -64,8 +72,11 @@ export class UsersService {
         return `This action updates a #${id} user`;
     }
 
-    block(id: string): Promise<User> {
-        throw new Error('Method not implemented.');
+    async block(id: string, adminUser: User): Promise<User> {
+        const userToBlock = await this.findOneById(id);
+        userToBlock.isActive = false;
+        userToBlock.lastUpdatedBy = adminUser;
+        return await this.usersRepository.save(userToBlock);
     }
 
 
