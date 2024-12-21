@@ -25,11 +25,12 @@ import { JwtService } from '@nestjs/jwt';
                     ApolloServerPluginLandingPageLocalDefault(),
                 ],
                 context({ req }) {
-                    const token = req.headers.authorization?.replace('Bearer ', '');
-                    if (!token) throw new Error('No token provided');
+                    // to block graphql playground if u dont have a token
+                    // const token = req.headers.authorization?.replace('Bearer ', '');
+                    // if (!token) throw new Error('No token provided');
 
-                    const payload = jwtService.decode(token);
-                    if (!payload) throw new Error('Invalid token');
+                    // const payload = jwtService.decode(token);
+                    // if (!payload) throw new Error('Invalid token');
 
 
                 },
