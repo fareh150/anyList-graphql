@@ -13,7 +13,7 @@ import { JwtService } from '@nestjs/jwt';
 @Module({
     imports: [
         ConfigModule.forRoot(),
-        // ? async configuration of GraphQL
+        // ? async configuration of GraphQL to secure the playground
         GraphQLModule.forRootAsync({
             driver    : ApolloDriver,
             imports   : [AuthModule],
