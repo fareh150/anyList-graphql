@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateItemInput } from './dto/create-item.input';
 import { UpdateItemInput } from './dto/update-item.input';
 import { Item } from './entities/item.entity';
@@ -32,8 +32,19 @@ export class ItemsService {
         });
     }
 
-    async findOne(id: string): Promise<Item> {
-        const item = await this.itemsRepository.findOneBy({ id });
+    async findOne(id: string, user: User): Promise<Item> {
+        const item = await this.itemsRepository.findOneBy({
+            id,
+            user: {
+                id: user.id,
+            },
+            // Mi forma para .findOne
+            // where    : { id },
+            // relations: ['user'],
+        });
+        // if (item.user.id !== user.id) {
+        //     throw new BadRequestException(`Item with id #${id} not found`);
+        // }
 
         if (!item) {
             throw new NotFoundException(`Item with id #${id} not found`);
@@ -55,9 +66,12 @@ export class ItemsService {
         return await this.itemsRepository.save(item);
     }
 
-    async remove(id: string): Promise<Item> {
+    async remove(
+        id: string,
+        user: User,
+    ): Promise<Item> {
         // Todo: soft delete
-        const item = await this.findOne(id);
+        const item = await this.findOne(id,user);
         await this.itemsRepository.delete(item.id);
 
         return item;
