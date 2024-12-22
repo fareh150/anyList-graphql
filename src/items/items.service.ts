@@ -23,9 +23,13 @@ export class ItemsService {
         return await this.itemsRepository.save(newItem);
     }
 
-    async findAll(): Promise<Item[]> {
+    async findAll(user: User): Promise<Item[]> {
         // Todo: filtrar, paginar, por usuario, por fecha, etc
-        return await this.itemsRepository.find();
+        return await this.itemsRepository.find({
+            where: {
+                user,
+            },
+        });
     }
 
     async findOne(id: string): Promise<Item> {
