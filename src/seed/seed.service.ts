@@ -5,7 +5,8 @@ import { Item } from 'src/items/entities/item.entity';
 import { User } from 'src/users/entities/user.entity';
 import { UsersService } from 'src/users/users.service';
 import { Repository } from 'typeorm';
-import { SEED_USERS } from './seed-data';
+import { SEED_ITEMS, SEED_USERS } from './seed-data';
+import { ItemsService } from 'src/items';
 
 @Injectable()
 export class SeedService {
@@ -19,6 +20,7 @@ export class SeedService {
         @InjectRepository(User)
         private readonly userRepository: Repository<User>,
         private readonly usersService: UsersService,
+        private readonly itemsService: ItemsService,
     ) {
         this.isProd = configService.get('STATE') === 'prod';
     }
@@ -33,6 +35,7 @@ export class SeedService {
         const user = await this.loadUsers();
 
         // ! Create items
+        await this.loadItems(user);
         return true;
     }
 
@@ -53,7 +56,23 @@ export class SeedService {
     }
 
     async loadUsers(): Promise<User> {
-        const users = await Promise.all(SEED_USERS.map(user => this.usersService.create(user)));
+        const users = await Promise.all(
+            SEED_USERS.map(
+                user => this.usersService.create(user),
+            ),
+        );
         return users[0];
+    }
+
+    async loadItems(
+        user: User,
+    ): Promise<boolean> {
+        await Promise.all(
+            SEED_ITEMS.map(
+                item => this.itemsService.create(item, user),
+            ),
+        );
+
+        return true;
     }
 }
