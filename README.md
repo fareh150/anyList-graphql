@@ -23,6 +23,3 @@ npm run start:dev
 localhost:3000/graphql
 ```
 7. Ejecutar la __"Mutation"__ executeSeed, para llenar la base de datos con información
-```
-localhost:3000/graphql
-```
