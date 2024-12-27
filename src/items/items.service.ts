@@ -2,10 +2,10 @@ import { BadRequestException, Injectable, NotFoundException } from '@nestjs/comm
 import { CreateItemInput } from './dto/create-item.input';
 import { UpdateItemInput } from './dto/update-item.input';
 import { Item } from './entities/item.entity';
-import { Repository } from 'typeorm';
+import { Like, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/users/entities/user.entity';
-import { PaginationArgs } from 'src/common/dto/args/pagination.args';
+import { PaginationArgs, SearchArgs } from 'src/common/dto/args';
 
 @Injectable()
 export class ItemsService {
@@ -27,14 +27,17 @@ export class ItemsService {
     async findAll(
         user: User,
         paginationArgs: PaginationArgs,
+        searchArgs: SearchArgs,
     ): Promise<Item[]> {
         const { offset, limit } = paginationArgs;
-        // Todo: filtrar, paginar, por usuario, por fecha, etc
+        const { search } = searchArgs;
+
         return await this.itemsRepository.find({
             take : limit,
             skip : offset,
             where: {
                 user,
+                name: Like(`%${search.toLocaleLowerCase()}%`),
             },
         });
     }

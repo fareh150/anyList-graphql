@@ -28,9 +28,7 @@ export class ItemsResolver {
     @Args() paginationArgs: PaginationArgs,
     @Args() searchArgs: SearchArgs,
   ): Promise<Item[]> {
-      console.log('paginationArgs', paginationArgs);
-      console.log('searchArgs', searchArgs);
-      return await this.itemsService.findAll(user, paginationArgs);
+      return await this.itemsService.findAll(user, paginationArgs, searchArgs);
   }
 
   @Query(() => Item, { name: 'itemBy' })
