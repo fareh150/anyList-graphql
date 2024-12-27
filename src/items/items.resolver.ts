@@ -27,8 +27,8 @@ export class ItemsResolver {
     @CurrentUser() user: User,
     @Args() paginationArgs: PaginationArgs,
   ): Promise<Item[]> {
-    console.log('paginationArgs', paginationArgs);
-    
+      console.log('paginationArgs', paginationArgs);
+
       return await this.itemsService.findAll(user);
   }
 
