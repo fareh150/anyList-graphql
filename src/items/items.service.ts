@@ -32,14 +32,16 @@ export class ItemsService {
         const { offset, limit } = paginationArgs;
         const { search } = searchArgs;
 
-        return await this.itemsRepository.find({
-            take : limit,
-            skip : offset,
-            where: {
-                user,
-                name: Like(`%${search.toLocaleLowerCase()}%`),
-            },
-        });
+        const queryBuilder = this.itemsRepository.createQueryBuilder()
+            .take(limit)
+            .skip(offset)
+            .where('"userId" = :userId', { userId: user.id });
+
+        if (search) {
+            queryBuilder.andWhere('LOWER(name) LIKE :name', { name: `%${search.toLowerCase()}%` });
+        }
+
+        return await queryBuilder.getMany();
     }
 
     async findOne(id: string, user: User): Promise<Item> {
@@ -48,9 +50,6 @@ export class ItemsService {
             user: {
                 id: user.id,
             },
-            // Mi forma para .findOne
-            // where    : { id },
-            // relations: ['user'],
         });
         // if (item.user.id !== user.id) {
         //     throw new BadRequestException(`Item with id #${id} not found`);
