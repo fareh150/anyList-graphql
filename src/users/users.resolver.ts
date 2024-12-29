@@ -23,8 +23,10 @@ export class UsersResolver {
     async findAll(
       @Args() validRoles:ValidRolesArgs,
       @CurrentUser([ValidRoles.admin, ValidRoles.superUser]) user: User,
+      @Args() paginationArgs: PaginationArgs,
+      @Args() searchArgs: SearchArgs,
     ): Promise<User[]> {
-        return await this.usersService.findAll(validRoles.roles);
+        return await this.usersService.findAll(validRoles.roles, paginationArgs, searchArgs);
     }
 
   @Query(() => User, { name: 'user' })

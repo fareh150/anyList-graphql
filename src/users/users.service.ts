@@ -6,6 +6,7 @@ import { SignupInput } from 'src/auth/dto/signup.input';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ValidRoles } from 'src/auth/enums/valid-roles.enum';
+import { PaginationArgs, SearchArgs } from 'src/common/dto/args';
 
 @Injectable()
 export class UsersService {
@@ -30,20 +31,31 @@ export class UsersService {
         }
     }
 
-    async findAll( roles: ValidRoles[]): Promise<User[]> {
-        if (roles.length === 0) {
-            return this.usersRepository.find({
-                // ! Not needed id lazy loading is enabled in entity
-                //relations: {
-                //    lastUpdatedBy: true,
-                //},
-            });
+    async findAll(
+        roles: ValidRoles[],
+        paginationArgs: PaginationArgs,
+        searchArgs: SearchArgs,
+    ): Promise<User[]> {
+        const { offset, limit } = paginationArgs;
+        const { search } = searchArgs;
+
+        const queryBuilder = this.usersRepository.createQueryBuilder('user');
+
+        if (roles.length > 0) {
+            queryBuilder
+                .andWhere('ARRAY [roles] &&  ARRAY[:...roles]')
+                .setParameter('roles', roles);
         }
-        return this.usersRepository.createQueryBuilder()
-            .andWhere('ARRAY [roles] &&  ARRAY[:...roles]')
-            .setParameter('roles', roles)
-            .getMany();
+
+        if (search) {
+            queryBuilder.andWhere('LOWER(email) LIKE LOWER(:search) OR LOWER("fullName") LIKE LOWER(:search)', { search: `%${search.toLowerCase()}%` });
+        }
+
+        queryBuilder.skip(offset).take(limit);
+
+        return queryBuilder.getMany();
     }
+
 
     async findOneByEmail(email: string): Promise<User> {
         try {
