@@ -19,10 +19,6 @@ export class ListItem {
   @Field(() => Boolean)
       completed: boolean;
 
-  @Column({ type: 'date' })
-  @Field(() => Date, { nullable: true })
-      endDate?: Date;
-
   @ManyToOne(() => List, list => list.listItem, { lazy: true })
   // No ponemos field para poder hacer paginacion
       list: List;
