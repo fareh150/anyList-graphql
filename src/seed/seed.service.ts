@@ -5,10 +5,12 @@ import { Item } from 'src/items/entities/item.entity';
 import { User } from 'src/users/entities/user.entity';
 import { UsersService } from 'src/users/users.service';
 import { Repository } from 'typeorm';
-import { SEED_ITEMS, SEED_USERS } from './seed-data';
+import { SEED_ITEMS, SEED_LISTS, SEED_USERS } from './seed-data';
 import { ItemsService } from 'src/items';
 import { ListItem } from 'src/list-item/entities/list-item.entity';
 import { List } from 'src/lists/entities/list.entity';
+import { ListsService } from 'src/lists/lists.service';
+import { ListItemService } from 'src/list-item/list-item.service';
 
 @Injectable()
 export class SeedService {
@@ -27,6 +29,8 @@ export class SeedService {
         private readonly listRepository: Repository<List>,
         private readonly usersService: UsersService,
         private readonly itemsService: ItemsService,
+        private readonly listService: ListsService,
+        private readonly listItemService: ListItemService,
     ) {
         this.isProd = configService.get('STATE') === 'prod';
     }
@@ -42,6 +46,14 @@ export class SeedService {
 
         // ! Create items
         await this.loadItems(user);
+
+        //! Crear listas
+        const list = await this.loadLists(user);
+
+        // ! Crear listItems
+        const items = await this.itemsService.findAll(user, { limit: 15, offset: 0 }, {});
+        await this.loadListItems(items, list);
+
         return true;
     }
 
@@ -88,6 +100,33 @@ export class SeedService {
         await Promise.all(
             SEED_ITEMS.map(
                 item => this.itemsService.create(item, user),
+            ),
+        );
+
+        return true;
+    }
+
+    async loadLists(
+        user: User,
+    ): Promise<List> {
+        const lists = await Promise.all(
+            SEED_LISTS.map(list => this.listService.create(list, user)),
+        );
+        return lists[0];
+    }
+
+    async loadListItems(
+        items: Item[],
+        list: List,
+    ): Promise<boolean> {
+        await Promise.all(
+            items.map(
+                item => this.listItemService.create({
+                    itemId   : item.id,
+                    listId   : list.id,
+                    quantity : Math.floor(Math.random() * 10),
+                    completed: Math.round(Math.random() * 1) === 0 ? true : false,
+                }),
             ),
         );
 
