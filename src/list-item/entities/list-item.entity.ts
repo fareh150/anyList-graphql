@@ -20,7 +20,7 @@ export class ListItem {
       completed: boolean;
 
   @ManyToOne(() => List, list => list.listItem, { lazy: true })
-  // No ponemos field para poder hacer paginacion
+  @Field(() => List)
       list: List;
 
   @ManyToOne(() => Item, item => item.listItem, { lazy: true })
