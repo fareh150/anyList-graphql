@@ -7,10 +7,15 @@ async function bootstrap() {
     const app = await NestFactory.create(AppModule);
     app.useGlobalPipes(
         new ValidationPipe({
-            whitelist           : true,
+            whitelist: true,
             // forbidNonWhitelisted: true, // comentado permite mas args
         }),
     );
-    await app.listen(process.env.PORT ?? 3000);
+
+    const PORT = process.env.PORT ?? 3000; // se agrega el puerto de la variable de entorno para que lo asigne digital ocean
+
+    await app.listen(PORT);
+
+    console.log(`Server running on port ${PORT}`);
 }
 bootstrap();
